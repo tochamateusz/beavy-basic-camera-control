@@ -50,8 +50,18 @@ fn setup(
 ) {
     commands.spawn((
         Name::new("Camera"),
-        Camera3d::default(),
-        Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Camera3dBundle {
+            projection: OrthographicProjection {
+                scaling_mode: bevy::render::camera::ScalingMode::Fixed {
+                    width: 8.0,
+                    height: 8.0,
+                },
+                ..OrthographicProjection::default_3d()
+            }
+            .into(),
+            transform: Transform::from_xyz(10.0, 12.0, 16.0).looking_at(Vec3::ZERO, Vec3::Y),
+            ..default()
+        },
     ));
 
     commands.spawn((
@@ -73,9 +83,30 @@ fn setup(
     ));
 
     commands.spawn((
+        Name::new("Cube2"),
+        Mesh3d(meshes.add(Cuboid::default())),
+        MeshMaterial3d(materials.add(Color::srgb(0.8, 0.7, 0.1))),
+        Transform::from_xyz(-2.5, 0.51, 2.5),
+    ));
+
+    commands.spawn((
+        Name::new("Cube3"),
+        Mesh3d(meshes.add(Cuboid::default())),
+        MeshMaterial3d(materials.add(Color::srgb(0.8, 0.1, 0.6))),
+        Transform::from_xyz(1.5, 0.51, -1.5),
+    ));
+
+    commands.spawn((
+        Name::new("Cube4"),
+        Mesh3d(meshes.add(Cuboid::default())),
+        MeshMaterial3d(materials.add(Color::srgb(0.1, 0.8, 0.6))),
+        Transform::from_xyz(-1.5, 0.51, -1.5),
+    ));
+
+    commands.spawn((
         Name::new("Light"),
         PointLight::default(),
-        Transform::from_xyz(3.0, 8.0, 5.0),
+        Transform::from_xyz(3.0, 2.0, 5.0),
     ));
 }
 
