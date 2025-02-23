@@ -3,17 +3,17 @@
 //! See also: `first_person_view_model` example, which does something similar but as a first-person
 //! camera view.
 
-use std::{
-    f32::consts::{FRAC_PI_2, PI},
-    ops::Range,
-};
-
 use bevy::{
     color::palettes::basic::{BLUE, LIME, RED},
     input::mouse::AccumulatedMouseMotion,
     pbr::{CascadeShadowConfigBuilder, NotShadowCaster, NotShadowReceiver},
     prelude::*,
     reflect::NamedField,
+};
+use bevy_mod_raycast::prelude::*;
+use std::{
+    f32::consts::{FRAC_PI_2, PI},
+    ops::Range,
 };
 
 #[derive(Debug, Resource)]
@@ -44,11 +44,12 @@ impl Default for CameraSettings {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(bevy_mod_raycast::low_latency_window_plugin()))
         .init_resource::<CameraSettings>()
         .add_systems(Startup, (setup, instructions))
         .add_systems(Update, orbit)
         .add_systems(Update, rotate)
+        .add_systems(Update, raycast)
         .run();
 }
 
@@ -150,6 +151,12 @@ fn instructions(mut commands: Commands) {
             ..default()
         },
     ));
+}
+
+fn raycast(cursor_ray: Res<CursorRay>, mut raycast: Raycast, mut gizmos: Gizmos) {
+    if let Some(cursor_ray) = **cursor_ray {
+        raycast.debug_cast_ray(cursor_ray, &default(), &mut gizmos);
+    }
 }
 
 fn rotate(mut entities: Query<(&Name, &mut Transform)>, time: Res<Time>) {
