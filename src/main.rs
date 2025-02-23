@@ -5,7 +5,7 @@
 
 use std::{f32::consts::FRAC_PI_2, ops::Range};
 
-use bevy::{input::mouse::AccumulatedMouseMotion, prelude::*};
+use bevy::{input::mouse::AccumulatedMouseMotion, prelude::*, reflect::NamedField};
 
 #[derive(Debug, Resource)]
 struct CameraSettings {
@@ -39,6 +39,7 @@ fn main() {
         .init_resource::<CameraSettings>()
         .add_systems(Startup, (setup, instructions))
         .add_systems(Update, orbit)
+        .add_systems(Update, rotate)
         .run();
 }
 
@@ -125,6 +126,17 @@ fn instructions(mut commands: Commands) {
             ..default()
         },
     ));
+}
+
+fn rotate(mut entities: Query<(&Name, &mut Transform)>, time: Res<Time>) {
+    for (name, mut transform) in &mut entities {
+        if name.to_string() == "Cube4" {
+            let (yaw, pitch, roll) = transform.rotation.to_euler(EulerRot::YXZ);
+            let yaw = yaw + time.delta_secs();
+
+            transform.rotation = Quat::from_euler(EulerRot::YXZ, yaw, pitch, roll);
+        }
+    }
 }
 
 fn orbit(
