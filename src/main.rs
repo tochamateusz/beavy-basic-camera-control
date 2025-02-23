@@ -3,9 +3,18 @@
 //! See also: `first_person_view_model` example, which does something similar but as a first-person
 //! camera view.
 
-use std::{f32::consts::FRAC_PI_2, ops::Range};
+use std::{
+    f32::consts::{FRAC_PI_2, PI},
+    ops::Range,
+};
 
-use bevy::{input::mouse::AccumulatedMouseMotion, prelude::*, reflect::NamedField};
+use bevy::{
+    color::palettes::basic::{BLUE, LIME, RED},
+    input::mouse::AccumulatedMouseMotion,
+    pbr::{CascadeShadowConfigBuilder, NotShadowCaster, NotShadowReceiver},
+    prelude::*,
+    reflect::NamedField,
+};
 
 #[derive(Debug, Resource)]
 struct CameraSettings {
@@ -108,6 +117,21 @@ fn setup(
         Name::new("Light"),
         PointLight::default(),
         Transform::from_xyz(3.0, 2.0, 5.0),
+    ));
+
+    commands.spawn((
+        DirectionalLight {
+            illuminance: light_consts::lux::OVERCAST_DAY,
+            shadows_enabled: true,
+            ..default()
+        },
+        Transform::from_rotation(Quat::from_euler(EulerRot::ZYX, 0.0, PI / 2., -PI / 4.)),
+        CascadeShadowConfigBuilder {
+            first_cascade_far_bound: 7.0,
+            maximum_distance: 25.0,
+            ..default()
+        }
+        .build(),
     ));
 }
 
