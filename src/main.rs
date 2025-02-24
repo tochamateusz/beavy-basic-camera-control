@@ -44,12 +44,11 @@ impl Default for CameraSettings {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(bevy_mod_raycast::low_latency_window_plugin()))
+        .add_plugins(DefaultPlugins)
         .init_resource::<CameraSettings>()
         .add_systems(Startup, (setup, instructions))
         .add_systems(Update, orbit)
         .add_systems(Update, rotate)
-        .add_systems(Update, raycast)
         .run();
 }
 
@@ -151,12 +150,6 @@ fn instructions(mut commands: Commands) {
             ..default()
         },
     ));
-}
-
-fn raycast(cursor_ray: Res<CursorRay>, mut raycast: Raycast, mut gizmos: Gizmos) {
-    if let Some(cursor_ray) = **cursor_ray {
-        raycast.debug_cast_ray(cursor_ray, &default(), &mut gizmos);
-    }
 }
 
 fn rotate(mut entities: Query<(&Name, &mut Transform)>, time: Res<Time>) {
